@@ -23,7 +23,7 @@ month_to_num = {
 if __name__ == '__main__':
     header_csv9 = ['Name', 'Date', 'Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'OI']
     header_csv8 = ['Name', 'Date', 'Time', 'Open', 'High', 'Low', 'Close', 'Volume']    # Some of the data has Open Interest missing.
-    top_dir = Path('options_data')      # Folder where the data is kept. It has three folders by the year (like 2019, 2020 etc). Output is kept in this folder.
+    top_dir = Path('option_data')      # Folder where the data is kept. It has three folders by the year (like 2019, 2020 etc). Output is kept in this folder.
     all_years_dir = [x for x in top_dir.iterdir() if x.is_dir()]        # Path to all all year folders.
     all_df = pd.DataFrame(columns=header_csv9)      # Final df that has all the data.
     for year_dir in all_years_dir:
