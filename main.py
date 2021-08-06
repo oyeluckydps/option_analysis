@@ -5,25 +5,28 @@ from io import BytesIO
 import pandas as pd
 from datetime import date, time, datetime
 
-month_to_num = {
-    'January': '01',
-    'February': '02',
-    'March': '03',
-    'April': '04',
-    'May': '05',
-    'June': '06',
-    'July': '07',
-    'August': '08',
-    'September': '09',
-    'October': '10',
-    'November': '11',
-    'December': '12'
-}
+data_dir = Path('option_data')
 
-if __name__ == '__main__':
+def clean_data():
+
+    month_to_num = {
+        'January': '01',
+        'February': '02',
+        'March': '03',
+        'April': '04',
+        'May': '05',
+        'June': '06',
+        'July': '07',
+        'August': '08',
+        'September': '09',
+        'October': '10',
+        'November': '11',
+        'December': '12'
+    }
+
     header_csv9 = ['Name', 'Date', 'Time', 'Open', 'High', 'Low', 'Close', 'Volume', 'OI']
     header_csv8 = ['Name', 'Date', 'Time', 'Open', 'High', 'Low', 'Close', 'Volume']    # Some of the data has Open Interest missing.
-    top_dir = Path('option_data')      # Folder where the data is kept. It has three folders by the year (like 2019, 2020 etc). Output is kept in this folder.
+    top_dir = data_dir      # Folder where the data is kept. It has three folders by the year (like 2019, 2020 etc). Output is kept in this folder.
     all_years_dir = [x for x in top_dir.iterdir() if x.is_dir()]        # Path to all all year folders.
     all_df = pd.DataFrame(columns=header_csv9)      # Final df that has all the data.
     for year_dir in all_years_dir:
@@ -74,4 +77,19 @@ if __name__ == '__main__':
             all_df = pd.concat([all_df, expiry_df], sort=False)
     all_file_path = top_dir/Path('concat/all_in_1.csv')
     all_df.to_csv(all_file_path)
+    pass
+
+if __name__ == '__main__':
+    all_data_filename = data_dir/Path('concat/all_in_1.csv')
+    if not all_data_filename.is_file():
+        clean_data()
+    master_data = pd.read_csv(all_data_filename)
+    master_date = master_data['Date']
+    uniq_dates = master_date.unique()
+    date_sort_index = [i[0] for i in sorted(enumerate(uniq_dates), key=lambda x: x[1])]
+    uniq_dates_sorted = list(uniq_dates[date_sort_index])
+    day_hash = {dat: index for index, dat in enumerate(uniq_dates_sorted)}
+    day_id = pd.Series([day_hash[day] for day in master_date])
+    master_data['Day'] = day_id
+    master_data.to_csv(all_data_filename)
     pass
